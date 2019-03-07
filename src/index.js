@@ -7,26 +7,33 @@ const paddleB = document.querySelector('#paddleB');
 const playground = document.querySelector('#playground');
 const playingBall = document.querySelector('#ball');
 
+const playerOne = document.querySelector('.playerOneScore');
+
+const playerTwo = document.querySelector('.playerTwoScore');
+
+const scoreBoard = document.querySelector('.scoreBoard');
+
 //data for game
 const pingPong = {
-	paddleA: {
-		x: 50,
-		y: 0,
-		width: 20,
-		height: 70,
-	},
-	paddleB: {
-		x: 320,
-		y: 100,
-		width: 20,
-		height: 70,
-	},
 	playground: {
 		//get how far the playing space is from top of page
 		offsetTop: playground.getBoundingClientRect().top,
 		height: playground.getBoundingClientRect().height,
 		width: playground.getBoundingClientRect().width,
 	},
+	paddleA: {
+		x: 80,
+		y: 0,
+		width: 20,
+		height: 70,
+	},
+	paddleB: {
+		x: 520,
+		y: 100,
+		width: 20,
+		height: 70,
+	},
+
 	ball: {
 		speed: 5,
 		x: 150,
@@ -34,8 +41,11 @@ const pingPong = {
 		directionX: 1,
 		directionY: 1,
 		height: 20,
+		width: 20,
 		directionChange: [-1, 1],
 	},
+	playerAScore: 0,
+	playerBScore: 0,
 };
 
 const renderPaddles = () => {
@@ -71,7 +81,6 @@ const handleMouseInputs = () => {
 
 const ballHitsTopBottom = () => {
 	const y = pingPong.ball.y;
-	console.log(y);
 	return y < 0 || y > pingPong.playground.height - pingPong.ball.height;
 };
 
@@ -90,6 +99,9 @@ const playerAWin = () => {
 
 	//update move direction
 	pingPong.ball.directionX = -1;
+
+	//update score
+	pingPong.playerAScore += 1;
 };
 
 const playerBWin = () => {
@@ -100,6 +112,9 @@ const playerBWin = () => {
 	//update move direction
 	pingPong.ball.directionX = 1;
 	pingPong.ball.directionY = pingPong.ball.directionChange[Math.floor(Math.random() * 2)];
+
+	//update score
+	pingPong.playerBScore += 1;
 };
 
 const moveBall = () => {
@@ -120,7 +135,21 @@ const moveBall = () => {
 		playerBWin();
 	}
 
-	//check paddles (later)
+	//check right paddle
+	if (
+		pingPong.ball.x === pingPong.paddleB.x - (pingPong.ball.width + pingPong.paddleB.width) &&
+		(pingPong.ball.y >= pingPong.paddleB.y && pingPong.ball.y <= pingPong.paddleB.y + pingPong.paddleB.height)
+	) {
+		pingPong.ball.directionX *= -1;
+	}
+
+	//check left paddle
+	if (
+		pingPong.ball.x === pingPong.paddleA.x + pingPong.ball.width &&
+		(pingPong.ball.y >= pingPong.paddleA.y && pingPong.ball.y <= pingPong.paddleA.y + pingPong.paddleA.height)
+	) {
+		pingPong.ball.directionX *= -1;
+	}
 
 	//update ball position
 	ball.x += ball.speed * ball.directionX;
@@ -137,21 +166,31 @@ const gameLoop = () => {
 	moveBall();
 };
 
+const scores = () => {
+	//scores
+	playerOne.textContent = 'player one score: ' + pingPong.playerAScore;
+
+	playerTwo.textContent = 'player Two score: ' + pingPong.playerBScore;
+};
+
 const render = () => {
+	scores();
 	renderBall();
 	renderPaddles();
-	window.requestAnimationFrame(render);
+	requestAnimationFrame(render);
 };
 
 const init = () => {
-	//create a timer for ball movement
+	//create a timer for ball movement that is slower then request animationframe
 	pingPong.timer = setInterval(gameLoop, 25);
 
 	//view rendering
-	window.requestAnimationFrame(render);
+	requestAnimationFrame(render);
 
 	//inputs
 	handleMouseInputs();
 };
 
-init();
+if (pingPong.playerAScore < 10 && pingPong.playerBScore < 10) {
+	init();
+}
