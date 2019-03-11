@@ -7,11 +7,16 @@ const paddleB = document.querySelector('#paddleB');
 const playground = document.querySelector('#playground');
 const playingBall = document.querySelector('#ball');
 
-const playerOne = document.querySelector('.playerOneScore');
-
-const playerTwo = document.querySelector('.playerTwoScore');
-
 const scoreBoard = document.querySelector('.scoreBoard');
+
+//create elements
+
+const playerOne = document.createElement('h1');
+const playerTwo = document.createElement('h1');
+
+//new game button
+const button = document.createElement('button');
+button.innerText = 'New Game';
 
 //data for game
 const pingPong = {
@@ -46,6 +51,7 @@ const pingPong = {
 	},
 	playerAScore: 0,
 	playerBScore: 0,
+	maxScore: 10,
 };
 
 const renderPaddles = () => {
@@ -62,12 +68,12 @@ const handleMouseInputs = () => {
 		pingPong.isPaused = false;
 	});
 
-	//pause game when mouse leaves playground
+	//check if mouse in play area
 	playground.addEventListener('mouseleave', () => {
 		pingPong.isPaused = true;
 	});
 
-	//calculate the paddle position by mouse position
+	//move player paddle based off mouse move
 	playground.addEventListener('mousemove', e => {
 		//checks if mouse is within playground area and moves paddle accordingly
 		if (
@@ -77,6 +83,20 @@ const handleMouseInputs = () => {
 			pingPong.paddleB.y = e.y - playground.getBoundingClientRect().top - pingPong.paddleB.height / 2;
 		}
 	});
+};
+
+const autoMovePaddleA = () => {
+	//make auto move a little slower then ball
+	const speed = 4;
+	let direction = 1;
+
+	const paddleAY = pingPong.paddleA.y + pingPong.paddleA.height / 2;
+
+	if (paddleAY > pingPong.ball.y) {
+		direction = -1;
+	}
+
+	pingPong.paddleA.y += direction * speed;
 };
 
 const ballHitsTopBottom = () => {
@@ -163,34 +183,72 @@ const renderBall = () => {
 };
 
 const gameLoop = () => {
-	moveBall();
+	//if game is not paused make movement happen
+	if (!pingPong.isPaused) {
+		autoMovePaddleA();
+		moveBall();
+	}
+
+	//if either player gets to the set score, end game, display winner
+	if (pingPong.playerAScore >= pingPong.maxScore || pingPong.playerBScore >= pingPong.maxScore) {
+		clearInterval(pingPong.timer);
+
+		scoreBoard.innerHTML =
+			pingPong.playerAScore === pingPong.maxScore ? '<h1>Player A wins</h1>' : '<h1>Player B wins</h1>';
+
+		scoreBoard.appendChild(button);
+	}
 };
 
+//setup score for players
 const scores = () => {
 	//scores
 	playerOne.textContent = 'player one score: ' + pingPong.playerAScore;
 
 	playerTwo.textContent = 'player Two score: ' + pingPong.playerBScore;
+
+	scoreBoard.appendChild(playerOne);
+	scoreBoard.appendChild(playerTwo);
 };
 
+//keep rerendering while condition is met
 const render = () => {
-	scores();
-	renderBall();
-	renderPaddles();
-	requestAnimationFrame(render);
+	//checks if either player has won to reset scoreboard
+	if (pingPong.playerAScore < pingPong.maxScore && pingPong.playerBScore < pingPong.maxScore) {
+		if (!pingPong.isPaused) {
+			scores();
+			renderBall();
+			renderPaddles();
+			requestAnimationFrame(render);
+		} else {
+			requestAnimationFrame(render);
+		}
+	}
 };
 
+//start game function
 const init = () => {
+	//view rendering
+	render();
+
 	//create a timer for ball movement that is slower then request animationframe
 	pingPong.timer = setInterval(gameLoop, 25);
-
-	//view rendering
-	requestAnimationFrame(render);
 
 	//inputs
 	handleMouseInputs();
 };
 
-if (pingPong.playerAScore < 10 && pingPong.playerBScore < 10) {
+init();
+
+//to restart a new game
+button.addEventListener('click', () => {
+	pingPong.playerAScore = 0;
+	pingPong.playerBScore = 0;
+
+	//clear scoreboard and reset it
+	scoreBoard.innerHTML = '';
+	scores();
+
+	//start game again
 	init();
-}
+});
