@@ -203,9 +203,9 @@ const gameLoop = () => {
 //setup score for players
 const scores = () => {
 	//scores
-	playerOne.textContent = 'player one score: ' + pingPong.playerAScore;
+	playerOne.textContent = 'Player One score: ' + pingPong.playerAScore;
 
-	playerTwo.textContent = 'player Two score: ' + pingPong.playerBScore;
+	playerTwo.textContent = 'Player Two score: ' + pingPong.playerBScore;
 
 	scoreBoard.appendChild(playerOne);
 	scoreBoard.appendChild(playerTwo);

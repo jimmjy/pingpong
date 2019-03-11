@@ -1,5 +1,6 @@
 body {
     text-align: center;
+    background: rgb(71, 158, 71);
 }
 
 #game {
@@ -20,6 +21,8 @@ body {
     overflow: hidden;
     cursor: pointer;
     background-repeat: no-repeat;
+    border-radius: 10px;
+    border: 1px solid white;
 }
 
 #ball {
