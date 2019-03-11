@@ -1,7 +1,11 @@
+body {
+  text-align: center; }
+
 #game {
   position: relative;
   width: 600px;
-  height: 300px; }
+  height: 300px;
+  margin: 0 auto; }
 
 #playground {
   background: url(../images/143352f5a501d4e382fc36ebd8d03f4b.png);
