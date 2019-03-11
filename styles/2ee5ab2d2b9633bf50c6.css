@@ -1,5 +1,6 @@
 body {
-  text-align: center; }
+  text-align: center;
+  background: #479e47; }
 
 #game {
   position: relative;
@@ -17,7 +18,9 @@ body {
   left: 0;
   overflow: hidden;
   cursor: pointer;
-  background-repeat: no-repeat; }
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  border: 1px solid white; }
 
 #ball {
   background: #fbb;
